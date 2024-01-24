@@ -24,8 +24,19 @@ def calc_label(label: np.ndarray, threshold: float):
     }
 
     # TODO Start: Finish this function #
-    raise NotImplementedError
-    return {"mountain": True, "sky": True, "water": True}
+
+    number_of_mountain = np.sum(np.isin(label, label2id["mountain"]))
+    number_of_sky = np.sum(np.isin(label, label2id["sky"]))
+    number_of_water = np.sum(np.isin(label, label2id["water"]))
+
+    size_of_label = label.size
+
+    # raise NotImplementedError
+    return {
+        "mountain": number_of_mountain > threshold * size_of_label,
+        "sky": number_of_sky > threshold * size_of_label,
+        "water": number_of_water > threshold * size_of_label
+    }
     # TODO End #
 
 
@@ -40,8 +51,8 @@ def process_data(mode: str, threshold: float):
 
     # TODO Start: Append directory in pathlib.Path, so that they point to `./data/{mode}/imgs`
     #  and `./data/{mode}/labels` #
-    image_dir = None
-    label_dir = None
+    image_dir = (Path(working_dir) / "imgs").resolve()
+    label_dir = (Path(working_dir) / "labels").resolve()
     # TODO End #
 
     print(f"[Data] Now in {working_dir}...")
@@ -49,12 +60,11 @@ def process_data(mode: str, threshold: float):
     out_str = "img_path,mountain,sky,water\n"
 
     assert os.path.exists(image_dir), "No directory called `imgs` found in working directory!"
-    assert os.path.exists(label_dir), "No directory called `labels` found in working " \
-                                                                "directory!"
+    assert os.path.exists(label_dir), "No directory called `labels` found in working directory!"
 
     # TODO Start: Construct a list of filenames without suffix from image_dir, like ['48432_b67ec6cd63_b',
     #  '70190_90b25efb3b_b', ...] #
-    filename_list = [None, None, ...]
+    filename_list = [f.stem for f in Path(label_dir).iterdir() if f.is_file()]
     # TODO End #
 
     for idx, file_name in tqdm(enumerate(filename_list), total=len(filename_list)):
@@ -70,14 +80,16 @@ def process_data(mode: str, threshold: float):
 
     # After all file has been processed, write `out_str` to `{working_dir}/file.txt`
     # TODO Start: Write out_str to `{working_dir}/file.txt` in overwritten mode #
-    raise NotImplementedError
+    with (Path(working_dir) / "file.txt").open("w") as f:
+        f.write(out_str)
+    # raise NotImplementedError
     # TODO End #
 
 
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--threshold", type=float, default=0.2, help="Threshold for determining if a label exists in "
-                                                                   "the image.")
+                                                                     "the image.")
     parser.add_argument("--mode", type=str, choices=["train", "val", "test"], default="train")
     args = parser.parse_args()
 

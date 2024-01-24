@@ -13,7 +13,7 @@ if __name__ == "__main__":
     # Meta info
     parser.add_argument("--task_name", type=str, default="baseline", help="Task name to save.")
     parser.add_argument("--mode", type=str, choices=["train", "test"], default="train", help="Mode to run.")
-    parser.add_argument("--device", type=int, default=0 if torch.cuda.is_available() else "cpu", help="Device number.")
+    parser.add_argument("--device", type=int, default=0 if torch.cuda.is_available() else torch.device("cpu"), help="Device number.")
     parser.add_argument("--num_workers", type=int, default=0, help="Spawn how many processes to load data.")
     parser.add_argument("--rng_seed", type=int, default=114514, help='manual seed')
 
@@ -24,7 +24,8 @@ if __name__ == "__main__":
     parser.add_argument("--save_path", type=str, default="./save/", help="Checkpoint path to save.")
     parser.add_argument("--save_freq", type=int, default=1, help="Save model every how many epochs.")
     # TODO Start: Define `args.val_freq` and `args.print_freq` here #
-
+    parser.add_argument("--val_freq", type=int, default=1, help="Validate model every how many epochs.")
+    parser.add_argument("--print_freq", type=int, default=1, help="Print model every how many epochs.")
     # TODO End #
     parser.add_argument("--batch_size", type=int, default=8, help="Entry numbers every batch.")
 
@@ -45,7 +46,7 @@ if __name__ == "__main__":
         optimizer = optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     elif args.optimizer == "Adam":
         # TODO Start: define Adam optimizer here #
-        optimizer = None
+        optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
         # TODO End #
     else:
         raise NotImplementedError("You must specify a valid optimizer type!")

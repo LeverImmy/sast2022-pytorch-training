@@ -1,7 +1,7 @@
 ipython
 pillow
 numpy
-torch==1.12.0
+torch
 requests
 tqdm
 matplotlib

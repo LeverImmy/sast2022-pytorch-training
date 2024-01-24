@@ -3,9 +3,10 @@ import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset
 
+
 # TODO Start: Inherit from torch.utils.data.Dataset #
-class LandScapeDataset(object):
-# TODO End #
+class LandScapeDataset(Dataset):
+    # TODO End #
     def __init__(self, mode="train"):
         self.mode = mode
         if mode == "train" or mode == "val":
@@ -20,7 +21,7 @@ class LandScapeDataset(object):
 
     def __len__(self):
         # TODO Start: Return length of current dataset #
-        return 0
+        return len(self.images)
         # TODO End #
 
     def __getitem__(self, idx):
@@ -33,12 +34,14 @@ class LandScapeDataset(object):
 
         # TODO Start: Use Image from PIL to load image, then resize it to (w/4, h/4) #
         image = Image.open(f"./data/{self.mode}/imgs/{file_name}")
-        image = image.resize((0, 0))  # Resize to (w/4, h/4)
+        image = image.resize((image.width // 4, image.height // 4))  # Resize to (w/4, h/4)
         # TODO End #
 
         array = np.array(image)
         # TODO Start: What is this line doing? #
-        # array = array.transpose((2, 0, 1))  # From (192, 256, 3) to (3, 192, 256)
+        array = array.transpose((2, 0, 1))  # From (192, 256, 3) to (3, 192, 256)
+        # 当处理图像数据时，通常会使用 (height, width, channels) 的顺序
+        # 但某些模型或操作可能需要 (channels, height, width) 的顺序
         # TODO End #
 
         ret_dict = {

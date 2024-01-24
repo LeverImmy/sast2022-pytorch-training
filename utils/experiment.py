@@ -24,13 +24,14 @@ def initiate_environment(args):
 
 def get_loader(args):
     num_workers = args.num_workers
+    # num_workers 指定了使用多少个 Python 子进程来异步加载数据，以提高数据读取的效率
     val_dataset = LandScapeDataset("val")
     val_dataloader = DataLoader(val_dataset, shuffle=False, num_workers=num_workers, batch_size=args.batch_size)
 
     if args.mode == "train":
         dataset = LandScapeDataset(args.mode)
         # TODO Start: Finish dataloader here #
-        dataloader = None
+        dataloader = DataLoader(dataset, shuffle=True, num_workers=num_workers, batch_size=args.batch_size)
         # TODO End #
     elif args.mode == "test":
         dataset = LandScapeDataset(args.mode)
@@ -55,7 +56,7 @@ def load_model(args, model, optimizer):
     checkpoint = torch.load(args.checkpoint_path)
     model.load_state_dict(checkpoint['model'])
     # TODO Start: load state dict for optimizer #
-
+    optimizer.load_state_dict(checkpoint['optimizer'])
     # TODO End #
 
 
@@ -78,10 +79,10 @@ def train_one_epoch(epoch, train_loader, args, model, criterion, optimizer, stat
         pred_label = model(train_input)
 
         # TODO Start: understand this...
-        # optimizer.zero_grad()
-        # loss = criterion(pred_label.reshape(-1, 2), train_label.reshape(-1).long())
-        # loss.backward()
-        # optimizer.step()
+        optimizer.zero_grad()
+        loss = criterion(pred_label.reshape(-1, 2), train_label.reshape(-1).long())
+        loss.backward()
+        optimizer.step()
         # TODO END
 
         if train_idx % args.print_freq == 0:
